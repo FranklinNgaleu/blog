@@ -20,9 +20,10 @@ app.get('/', (req, res) => {
 })
 
 // Routers
-app.use('/api/articles', require('./routes/articles'))
-app.use('/api/commentaires', require('./routes/commentaires'))
-app.use('/api/tags', require('./routes/tags'))
+app.use('/articles', require('./routes/articles'))
+app.use('/commentaires', require('./routes/commentaires'))
+app.use('/tags', require('./routes/tags'))
+app.use('/articleTag', require('./routes/articleTag'))
 
 
 // Démarrage du serveur

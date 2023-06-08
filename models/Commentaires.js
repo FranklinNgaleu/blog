@@ -40,6 +40,7 @@ class Commentaires {
         })
     }
 
+
     static allForAuteur(auteur) {
         return new Promise((resolve, reject) => {
             const commentaires = []
@@ -66,10 +67,10 @@ class Commentaires {
         })
     }
 
+
     update(data) {
         return new Promise((resolve, reject) => {
-            db.run("UPDATE commentaires SET contenu = ?, auteur = ?, article_id = ?, created_at = ?, updated_at = ? WHERE id = ?", 
-            [data.contenu,data.auteur,data.article_id,data.created_at,data.updated_at, this.id], async (err) => {
+            db.run("UPDATE commentaires SET contenu = ? WHERE id = ?", [data.contenu, this.id], async (err) => {
                 if (err) {
                     console.error(err)
                     reject(err)
@@ -81,6 +82,21 @@ class Commentaires {
             })
         })
     }
+    // update(data) {
+    //     return new Promise((resolve, reject) => {
+    //         db.run("UPDATE commentaires SET contenu = ?, auteur = ?, article_id = ?, created_at = ?, updated_at = ? WHERE id = ?", 
+    //         [data.contenu,data.auteur,data.article_id,data.created_at,data.updated_at, this.id], async (err) => {
+    //             if (err) {
+    //                 console.error(err)
+    //                 reject(err)
+    //             }
+
+    //             const commentaire = Commentaires.find(this.id)
+
+    //             resolve(commentaire)
+    //         })
+    //     })
+    // }
 
     delete() {
         return new Promise((resolve, reject) => {

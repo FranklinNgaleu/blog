@@ -14,15 +14,10 @@ const Articles = require('../models/Articles')
 
     // Récupération d'un article
     router.route('/index/:id(\\d+)').get(checkArticleExist, async (req, res) => {
-        res.json(req.session.articles);
+        const result = await Articles.find(req.params.id)
+
+        res.send(result)
         
-    })
-
-    // Modifier un article
-    router.route('/update/:id(\\d+)').put(checkArticleExist, async (req, res) => {
-        req.session.articles = await req.session.articles.update(req.body)
-
-        res.json(`L'article ${req.session.articles.titre} à été modifié`)
     })
 
     //supprimer un article
@@ -38,6 +33,20 @@ const Articles = require('../models/Articles')
         })
     })
 
+    // Modifier un article
+    router.route('/update/:id(\\d+)').put(checkArticleExist, async (req, res) => {
+        try{
+            req.session.articles = await req.session.articles.update(req.body)
+
+            res.json(`L'article ${req.session.articles.titre} à été modifié`)
+        }catch(err){
+            console.error('erreur')
+
+            res.status(500).json('erreur serveur')
+        }
+        
+    })
+
 
     //ajouter un article
     router.route('/create').post(async (req, res) => { 
@@ -50,7 +59,7 @@ const Articles = require('../models/Articles')
         catch (err) {
             console.error('Erreur dans la route', err)
 
-            res.status(500).json('Erreur serveur, Echec de l\'ajout')
+            res.status(500).json('Erreur serveur, Echec du post')
         }
     })
 

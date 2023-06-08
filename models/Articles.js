@@ -1,5 +1,7 @@
 const db = require('../databases/db');
 const Commentaires = require('./Commentaires');
+const ArticleTag = require('./ArticleTag');
+const Tags = require('./Tags');
 
 class Articles {
     static #table_name = 'articles';
@@ -21,19 +23,10 @@ class Articles {
         this.commentaires = await Commentaires.allForArticle(this.id)
     }
 
-    static all() {
-        return new Promise((resolve, reject) => {
-            const articles = []
-            db.each('SELECT * FROM articles', (err, row) => {
-                if (err)
-                    reject(err)
-
-                articles.push(new Articles(row))
-            }, (err) => {
-                resolve(articles)
-            })
-        })
+    async get_tags() {
+        this.tags = await ArticleTag.allForArticle(this.id)
     }
+
 
     static all2() {
         return new Promise((resolve, reject) => {
@@ -44,8 +37,12 @@ class Articles {
 
                 articles.push(new Articles(row))
             }, async (err) => {
+                if (err)
+                    reject(err)
+
                 for (const article of articles) {
                     await article.get_commentaires()
+                    await article.get_tags()
                 }
 
                 resolve(articles)
@@ -53,19 +50,29 @@ class Articles {
         })
     }
 
-
     static find(id) {
         return new Promise((resolve, reject) => {
-            db.get('SELECT * FROM articles WHERE id = ?', id, (err, row) => {
+            const articles = []
+            db.each('SELECT * FROM articles WHERE id = ?', id, (err, row) => {
                 if (err)
                     reject(err)
 
-                const article = (row) ? new Articles(row) : null
-                resolve(article)
+                articles.push(new Articles(row))
+            }, async (err) => {
+                if (err)
+                    reject(err)
+
+                for (const article of articles) {
+                    await article.get_commentaires()
+                    await article.get_tags()
+                }
+
+                resolve(articles)
             })
         })
     }
 
+    
     create() {
         return new Promise((resolve, reject) => {
             db.run("INSERT INTO articles(titre, contenu, auteur, visibilite, created_at, updated_at) \
@@ -117,6 +124,7 @@ class Articles {
         return {
             id: this.id,
             title: this.titre,
+            content: this.contenu,
             created_at: this.created_at,
             last_edit: this.updated_at,
             visible: this.visibilite,
